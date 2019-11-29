@@ -16,46 +16,45 @@
 
 package com.google.samples.apps.sunflower
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import com.google.samples.apps.sunflower.adapters.PlantAdapter
+import com.google.samples.apps.sunflower.databinding.FragmentPlantListBinding
 import com.google.samples.apps.sunflower.utilities.InjectorUtils
 import com.google.samples.apps.sunflower.viewmodels.PlantListViewModel
 
 class PlantListFragment : Fragment() {
 
-    private lateinit var viewModel: PlantListViewModel
+    private val viewModel: PlantListViewModel by viewModels {
+        InjectorUtils.providePlantListViewModelFactory(requireContext())
+    }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_plant_list, container, false)
-        val context = context ?: return view
-
-        val factory = InjectorUtils.providePlantListViewModelFactory(context)
-        viewModel = ViewModelProviders.of(this, factory).get(PlantListViewModel::class.java)
+        val binding = FragmentPlantListBinding.inflate(inflater, container, false)
+        context ?: return binding.root
 
         val adapter = PlantAdapter()
-        view.findViewById<RecyclerView>(R.id.plant_list).adapter = adapter
+        binding.plantList.adapter = adapter
         subscribeUi(adapter)
 
         setHasOptionsMenu(true)
-        return view
+        return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.menu_plant_list, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_plant_list, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,9 +68,9 @@ class PlantListFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: PlantAdapter) {
-        viewModel.getPlants().observe(viewLifecycleOwner, Observer { plants ->
-            if (plants != null) adapter.submitList(plants)
-        })
+        viewModel.plants.observe(viewLifecycleOwner) { plants ->
+            adapter.submitList(plants)
+        }
     }
 
     private fun updateData() {

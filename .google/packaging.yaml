@@ -23,11 +23,11 @@ categories:   [Getting Started, Jetpack]
 languages:    [Kotlin]
 solutions:    [Mobile]
 
-github:       googlesamples/android-sunflower
+github:       android/sunflower
 
 level:        INTERMEDIATE
 
-icon:         screenshots/icon.png
+icon:         screenshots/ic_launcher-web.png
 
 apiRefs:
     - android:android.support.constraint.ConstraintLayout

@@ -16,31 +16,14 @@
 
 package com.google.samples.apps.sunflower.viewmodels
 
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
-import com.google.samples.apps.sunflower.data.GardenPlanting
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.google.samples.apps.sunflower.data.GardenPlantingRepository
 import com.google.samples.apps.sunflower.data.PlantAndGardenPlantings
 
 class GardenPlantingListViewModel internal constructor(
-        private val gardenPlantingRepository: GardenPlantingRepository
+    gardenPlantingRepository: GardenPlantingRepository
 ) : ViewModel() {
-
-    private val gardenPlantings = MediatorLiveData<List<GardenPlanting>>()
-    private val plantAndGardenPlantings = MediatorLiveData<List<PlantAndGardenPlantings>>()
-
-    init {
-        val liveGardenPlantings = gardenPlantingRepository.getGardenPlantings()
-        gardenPlantings.addSource(liveGardenPlantings, gardenPlantings::setValue)
-
-        val livePlantAndGardenPlantings = Transformations.map(gardenPlantingRepository.getPlantAndGardenPlantings()) {
-            it.filter { it.gardenPlantings.isNotEmpty() }
-        }
-        plantAndGardenPlantings.addSource(livePlantAndGardenPlantings, plantAndGardenPlantings::setValue)
-    }
-
-    fun getGardenPlantings() = gardenPlantings
-
-    fun getPlantAndGardenPlantings() = plantAndGardenPlantings
+    val plantAndGardenPlantings: LiveData<List<PlantAndGardenPlantings>> =
+            gardenPlantingRepository.getPlantedGardens()
 }
